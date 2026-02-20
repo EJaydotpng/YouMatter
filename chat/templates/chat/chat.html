@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mental Health Support Terminal</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --sidebar-bg: #0d1117;
+            --terminal-bg: #161b22;
+            --border-color: #30363d;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --soft-text: #c9d1d9;
+            --bot-color: #a5d6ff;
+            --user-color: #aff5b4;
+            --danger-color: #f85149;
+        }
+
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--soft-text); 
+            font-family: 'Segoe UI', 'Roboto Mono', monospace; 
+            display: flex; 
+            height: 100vh; 
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+        }
+
+        .new-chat-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            margin-bottom: 20px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+        }
+
+        .new-chat-btn:hover { background: #21262d; }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chat-item-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            transition: background 0.2s;
+        }
+
+        .chat-item-container:hover { background: #161b22; }
+        .chat-item-container.active { background: #21262d; border-left: 3px solid var(--accent-blue); }
+
+        .chat-item {
+            flex: 1;
+            padding: 10px;
+            font-size: 13px;
+            color: #8b949e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-decoration: none;
+        }
+
+        .chat-item-container:hover .chat-item,
+        .chat-item-container.active .chat-item { color: white; }
+
+        .delete-chat-btn {
+            padding: 10px;
+            color: #484f58;
+            text-decoration: none;
+            font-size: 14px;
+            visibility: hidden;
+            cursor: pointer;
+        }
+
+        .chat-item-container:hover .delete-chat-btn { visibility: visible; }
+        .delete-chat-btn:hover { color: var(--danger-color); }
+
+        .sidebar-header {
+            font-size: 20px;
+            font-weight: 600;
+            padding: 10px 0 20px;
+            color: white;
+            text-align: center;
+        }
+ 
+         /* Main Chat Area */
+         .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-color);
+        }
+
+        .terminal-header {
+            background: #161b22;
+            padding: 12px 20px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            box-shadow: 0 0 5px var(--accent-green);
+        }
+
+        .output-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .prompt-line {
+            margin-bottom: 24px;
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; display: block; margin-bottom: 12px; font-weight: 600; }
+        .user-label { color: var(--accent-green); }
+        .bot-label { color: var(--accent-blue); }
+
+        .user-text { color: var(--user-color); line-height: 1.6; font-size: 16px; white-space: pre-wrap; }
+        
+        /* Proper Markdown Styling */
+        .bot-text { color: var(--bot-color); font-size: 16px; line-height: 1.8; letter-spacing: 0.3px; }
+        .bot-text p { margin-top: 0; margin-bottom: 2em; }
+        .bot-text strong { color: #fff; font-weight: 700; }
+
+        .bot-text ul, .bot-text ol {
+            margin: 25px 0;
+            padding: 20px 20px 20px 45px;
+            background: rgba(88, 166, 255, 0.05);
+            border-radius: 10px;
+            border-left: 3px solid var(--accent-blue);
+        }
+        .bot-text li { margin-bottom: 15px; list-style-type: disc; }
+
+        .bot-text h1, .bot-text h2, .bot-text h3 {
+            color: #fff;
+            margin: 2.5em 0 1em;
+            font-size: 1.2em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .bot-text blockquote {
+            border-left: 4px solid var(--accent-green);
+            background: rgba(63, 185, 80, 0.07);
+            margin: 15px 0;
+            padding: 10px 20px;
+            font-style: italic;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .loading-dots {
+            display: none;
+            padding: 20px;
+            color: var(--accent-blue);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .pulse { animation: pulse-animation 2s infinite; }
+        @keyframes pulse-animation { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        .input-wrapper { padding: 20px 25px 40px; background: var(--bg-color); }
+        .input-area {
+            display: flex; padding: 18px 25px; background: #161b22; border: 1px solid var(--border-color);
+            border-radius: 12px; align-items: center; max-width: 850px; margin: 0 auto;
+        }
+        .input-prefix { color: var(--accent-blue); font-weight: bold; margin-right: 15px; font-size: 18px; }
+        .input-area input { flex: 1; background: transparent; border: none; color: #fff; font-family: inherit; font-size: 16px; outline: none; }
+
+        .output-box::-webkit-scrollbar { width: 6px; }
+        .output-box::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-header">YouMatter</div>
+    <a href="{% url 'new_chat' %}" class="new-chat-btn">+ New Chat</a>
+    <div class="chat-list">
+        {% for chat in chat_history_list %}
+            <div class="chat-item-container {% if current_chat.id == chat.id %}active{% endif %}">
+                <a href="{% url 'chat_detail' chat.id %}" class="chat-item">
+                    {{ chat.title }}
+                </a>
+                <a href="{% url 'delete_chat' chat.id %}" class="delete-chat-btn" title="Delete Chat" onclick="return confirm('Delete this chat history?')">
+                    ✕
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="terminal-header">
+        <div>
+            <span class="status-dot"></span>
+            <strong>Mental Health Support</strong>
+        </div>
+        <span style="color: #8b949e;">{{ current_chat.title|default:"Safe Space" }}</span>
+    </div>
+    
+    <div class="output-box" id="output-box">
+        {% if not messages %}
+            <div class="prompt-line" style="background: none; border: 1px solid var(--border-color);">
+                <span class="label bot-label">System</span>
+                <div class="bot-text">Welcome back. How can I support your well-being today?</div>
+            </div>
+        {% endif %}
+
+        {% for msg in messages %}
+            <div class="prompt-line">
+                <span class="label user-label">You</span>
+                <div class="user-text">{{ msg.prompt }}</div>
+            </div>
+            <div class="prompt-line">
+                <span class="label bot-label">Support Assistant</span>
+                <div class="bot-text" data-markdown="{{ msg.response }}">{{ msg.response }}</div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="loading-dots" id="loading">
+        <span class="pulse">Support Assistant is processing...</span>
+    </div>
+
+    <div class="input-wrapper">
+        <form id="chat-form" class="input-area">
+            {% csrf_token %}
+            <span class="input-prefix">❯</span>
+            <input type="text" id="prompt-input" name="prompt" placeholder="Share your thoughts..." autocomplete="off" autofocus required>
+        </form>
+    </div>
+</div>
+
+<script>
+    const chatForm = document.getElementById('chat-form');
+    const promptInput = document.getElementById('prompt-input');
+    const outputBox = document.getElementById('output-box');
+    const loadingIndicator = document.getElementById('loading');
+
+    // Function to parse all markdown elements
+    function parseAllMarkdown() {
+        document.querySelectorAll('.bot-text[data-markdown]').forEach(div => {
+            const markdownContent = div.getAttribute('data-markdown');
+            if (!div.dataset.parsed && markdownContent) {
+                div.innerHTML = marked.parse(markdownContent);
+                div.dataset.parsed = "true";
+            }
+        });
+    }
+
+    // Initial parse on load
+    parseAllMarkdown();
+
+    function scrollToBottom() { outputBox.scrollTop = outputBox.scrollHeight; }
+    scrollToBottom();
+
+    chatForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const prompt = promptInput.value;
+        if (!prompt) return;
+
+        const userDiv = document.createElement('div');
+        userDiv.className = 'prompt-line';
+        userDiv.innerHTML = `<span class="label user-label">You</span><div class="user-text">${prompt}</div>`;
+        outputBox.appendChild(userDiv);
+        
+        promptInput.value = '';
+        loadingIndicator.style.display = 'block';
+        scrollToBottom();
+
+        const formData = new FormData(chatForm);
+        formData.append('prompt', prompt);
+
+        try {
+            const response = await fetch('', {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const data = await response.json();
+
+            const botDiv = document.createElement('div');
+            botDiv.className = 'prompt-line';
+            botDiv.innerHTML = `<span class="label bot-label">Support Assistant</span><div class="bot-text">${marked.parse(data.response)}</div>`;
+            outputBox.appendChild(botDiv);
+
+            if (!window.location.pathname.includes('/chat/')) {
+                // window.location.href = `/chat/${data.chat_id}/`;
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            loadingIndicator.style.display = 'none';
+            scrollToBottom();
+            promptInput.focus();
+        }
+    };
+</script>
+
+</body>
+</html>
