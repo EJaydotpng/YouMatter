@@ -8,3 +8,9 @@
 /dataSources.local.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+
+# Environment
+.env
+
+# Database
+db.sqlite3
