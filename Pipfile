@@ -8,6 +8,7 @@ django = "*"
 google-generativeai = "*"
 python-dotenv = "*"
 google-genai = "*"
+django-allauth = {extras = ["socialaccount"], version = "*"}
 
 [dev-packages]
 

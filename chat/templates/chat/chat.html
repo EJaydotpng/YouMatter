@@ -219,6 +219,17 @@
 
 <div class="sidebar">
     <div class="sidebar-header">YouMatter</div>
+    
+    {% if user.is_authenticated %}
+    <div style="margin-bottom: 20px; font-size: 13px; color: #8b949e; text-align: center;">
+        <div>Logged in as <strong>{{ user.username }}</strong></div>
+        <form method="post" action="{% url 'account_logout' %}">
+            {% csrf_token %}
+            <button type="submit" style="background: none; border: none; color: var(--accent-blue); cursor: pointer; text-decoration: underline; margin-top: 5px;">Log Out</button>
+        </form>
+    </div>
+    {% endif %}
+
     <a href="{% url 'new_chat' %}" class="new-chat-btn">+ New Chat</a>
     <div class="chat-list">
         {% for chat in chat_history_list %}

@@ -3,18 +3,20 @@ from google.genai import types
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from .models import Chat, Message
 
 # Initialize the client
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
+@login_required
 def chat_view(request, chat_id=None):
     # Fetch previous chats for the sidebar
-    chat_history_list = Chat.objects.all().order_by('-created_at')
+    chat_history_list = Chat.objects.filter(user=request.user).order_by('-created_at')
 
     current_chat = None
     if chat_id:
-        current_chat = get_object_or_404(Chat, id=chat_id)
+        current_chat = get_object_or_404(Chat, id=chat_id, user=request.user)
 
     if request.method == "POST":
         prompt_text = request.POST.get("prompt")
@@ -23,7 +25,7 @@ def chat_view(request, chat_id=None):
         if not current_chat:
             # Create a title from the first 30 chars of the prompt
             title = prompt_text[:30] + '...' if len(prompt_text) > 30 else prompt_text
-            current_chat = Chat.objects.create(title=title)
+            current_chat = Chat.objects.create(title=title, user=request.user)
         
         system_instruction = (
             "You are a Mental Health Support assistant. "
@@ -72,12 +74,14 @@ def chat_view(request, chat_id=None):
         "messages": messages
     })
 
+@login_required
 def new_chat(request):
     """Start a fresh chat."""
     return redirect('chat')
 
+@login_required
 def delete_chat(request, chat_id):
     """Delete a chat and its messages."""
-    chat = get_object_or_404(Chat, id=chat_id)
+    chat = get_object_or_404(Chat, id=chat_id, user=request.user)
     chat.delete()
     return redirect('chat')
