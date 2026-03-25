@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'chat',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -67,7 +68,7 @@ ROOT_URLCONF = 'app.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -156,3 +157,8 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+# Ensure required credentials are set in .env
+if not SOCIALACCOUNT_PROVIDERS['google']['APP']['client_id']:
+    import warnings
+    warnings.warn("GOOGLE_CLIENT_ID is not set in the environment variables.")
