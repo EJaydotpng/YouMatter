@@ -8,6 +8,17 @@
 {% block tagline %}Sign in to access your secure chat space{% endblock %}
 
 {% block content %}
+    <form class="login" id="login_form" method="POST" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+        {% endif %}
+        <button type="submit">{% trans "Sign In" %}</button>
+    </form>
+
+    <div class="divider"><span>Or</span></div>
+
     <!-- Link to initialize Google OAuth login -->
     <a href="{% provider_login_url 'google' %}" class="google-btn">
         <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
@@ -21,4 +32,5 @@
     </a>
 
     <p style="font-size: 11px; margin-top: 20px;">Don't have an account? <a href="{% url 'account_signup' %}">Sign up.</a></p>
+    <a href="{% url 'account_reset_password' %}" style="font-size: 11px;">Forgot your password?</a>
 {% endblock %}

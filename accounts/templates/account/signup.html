@@ -1,7 +1,6 @@
 {% extends "account/base.html" %}
 
 {% load socialaccount %}
-{% load crispy_forms_tags %} 
 {% load allauth i18n %}
 
 {% block head_title %}{% trans "Sign Up" %}{% endblock %}
@@ -15,7 +14,7 @@
         {% if redirect_field_value %}
         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
         {% endif %}
-        <button class="primaryAction" type="submit">{% trans "Sign Up" %}</button>
+        <button type="submit">{% trans "Sign Up" %}</button>
     </form>
 
     <div class="divider"><span>Or</span></div>
@@ -32,6 +31,5 @@
         Sign up with Google
     </a>
 
-    <p style="font-size: 11px; margin-bottom: 0;">Your mental health history is strictly bound to your account.</p>
-    <a href="{% url 'account_login' %}">Already have an account? Log in.</a>
+    <p style="font-size: 11px; margin-top: 20px;">Already have an account? <a href="{% url 'account_login' %}">Log in.</a></p>
 {% endblock %}

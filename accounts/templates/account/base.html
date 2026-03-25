@@ -95,25 +95,45 @@
         }
 
         /* Form specific styles */
-        .login-box form p {
-            margin-bottom: 15px;
+        .login-box form {
             text-align: left;
+        }
+
+        .login-box form p {
+            margin-bottom: 20px;
+        }
+
+        .login-box form label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #8b949e;
+            font-weight: 500;
         }
 
         .login-box form input[type="text"],
         .login-box form input[type="email"],
         .login-box form input[type="password"] {
-            width: calc(100% - 22px); /* Adjust for padding and border */
-            padding: 10px;
-            margin-top: 5px;
+            width: 100%;
+            padding: 12px;
             background: #0d1117;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 6px;
             color: var(--soft-text);
             font-family: inherit;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .login-box form button[type="submit"] {
+        .login-box form input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+        }
+
+        .login-box form button[type="submit"],
+        .login-box .primaryAction {
             background: var(--accent-blue);
             color: white;
             border: none;
@@ -121,14 +141,30 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             width: 100%;
-            margin-top: 20px;
+            margin-top: 10px;
             transition: background-color 0.2s;
         }
 
-        .login-box form button[type="submit"]:hover {
+        .login-box form button[type="submit"]:hover,
+        .login-box .primaryAction:hover {
             background: #4285f4;
+        }
+
+        .login-box form input[type="checkbox"] {
+            margin-right: 8px;
+            accent-color: var(--accent-blue);
+        }
+
+        .login-box form ul.helptext, 
+        .login-box form span.helptext {
+            display: block;
+            font-size: 11px;
+            color: #8b949e;
+            margin-top: 5px;
+            list-style: none;
+            padding-left: 0;
         }
 
         .login-box a {
